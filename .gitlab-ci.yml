@@ -23,9 +23,9 @@ toolbox-image:
   stage: toolbox-image
   when: manual
   script:
-    - gcloud compute disks create "gitlab-ci-job-${CI_JOB_ID}" --image-project debian-cloud --image-family debian-9 --zone "${GCLOUD_ZONE}"
-    - gcloud compute images create debian-vmx --source-disk "gitlab-ci-job-${CI_JOB_ID}" --source-disk-zone "${GCLOUD_ZONE}" --licenses "https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx"
-    - gcloud compute disks delete "gitlab-ci-job-${CI_JOB_ID}"
+    - gcloud --project "${GCLOUD_PROJECT}" compute disks create "gitlab-ci-job-${CI_JOB_ID}" --image-project debian-cloud --image-family debian-9 --zone "${GCLOUD_ZONE}"
+    - gcloud --project "${GCLOUD_PROJECT}" compute images create debian-vmx --source-disk "gitlab-ci-job-${CI_JOB_ID}" --source-disk-zone "${GCLOUD_ZONE}" --licenses "https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx"
+    - gcloud --project "${GCLOUD_PROJECT}" compute disks delete "gitlab-ci-job-${CI_JOB_ID}"
 
 build:
   extends: .gcloud
