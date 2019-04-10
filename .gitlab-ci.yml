@@ -2,24 +2,37 @@ include:
   - remote: 'https://gitlab-templates.ddbuild.io/slack-notifier/v1/template.yml'
 
 stages:
+  - toolbox-image
   - build
 
-variables:
-  GCLOUD_PROJECT: datadog-build
-  GCLOUD_ZONE: us-east1-b
-  GCLOUD_NETWORK: datadog-build-us-east1
-  GCLOUD_SUBNET: datadog-build-us-east1-private
-
-test:
-  stage: build
-  image: google/cloud-sdk:slim
+.gcloud:
   tags: ['runner:main', 'size:large']
+  image: google/cloud-sdk:slim
+  variables:
+    GCLOUD_PROJECT: datadog-build
+    GCLOUD_ZONE: us-east1-b
+    GCLOUD_NETWORK: datadog-build-us-east1
+    GCLOUD_SUBNET: datadog-build-us-east1-private
+
+.gcloud-toolbox:
   before_script:
     - pip install awscli
     - aws ssm get-parameter --region us-east-1 --name ci.os-manifest.ci-os-manifest.json --with-decryption --query Parameter.Value --out text > ./google-sa.json
     - gcloud auth activate-service-account --key-file ./google-sa.json
-  script:
-    - gcloud --project "${GCLOUD_PROJECT}" compute instances create gitlab-ci-job-${CI_JOB_ID} --zone "${GCLOUD_ZONE}" --tags common,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-family debian-vmx --machine-type n1-standard-16
-
   after_script:
     - gcloud --project "${GCLOUD_PROJECT}" compute instances delete "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --delete-disks=all || true
+
+toolbox-image:
+  extends: .gcloud
+  stage: toolbox-image
+  when: manual
+  script:
+    - gcloud compute disks create "gitlab-ci-job-${CI_JOB_ID}" --image-project debian-cloud --image-family debian-9 --zone "${GCLOUD_ZONE}"
+    - gcloud compute images create debian-vmx --source-disk "gitlab-ci-job-${CI_JOB_ID}" --source-disk-zone "${GCLOUD_ZONE}" --licenses "https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx"
+    - gcloud compute disks delete "gitlab-ci-job-${CI_JOB_ID}"
+
+build:
+  extends: .gcloud-toolbox
+  stage: build
+  script:
+    - gcloud --project "${GCLOUD_PROJECT}" compute instances create gitlab-ci-job-${CI_JOB_ID} --zone "${GCLOUD_ZONE}" --tags common,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-family debian-vmx --machine-type n1-standard-16
