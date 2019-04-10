@@ -6,7 +6,7 @@ stages:
 
 test:
   stage: build
-  image: python:alpine
+  image: google/cloud-sdk:slim
   tags: ['runner:main', 'size:large']
   before_script:
     - pip install gcloud
