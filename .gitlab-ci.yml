@@ -13,14 +13,10 @@ stages:
     GCLOUD_ZONE: us-east1-b
     GCLOUD_NETWORK: datadog-build-us-east1
     GCLOUD_SUBNET: datadog-build-us-east1-private
-
-.gcloud-toolbox:
   before_script:
     - pip install awscli
     - aws ssm get-parameter --region us-east-1 --name ci.os-manifest.ci-os-manifest.json --with-decryption --query Parameter.Value --out text > ./google-sa.json
     - gcloud auth activate-service-account --key-file ./google-sa.json
-  after_script:
-    - gcloud --project "${GCLOUD_PROJECT}" compute instances delete "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --delete-disks=all || true
 
 toolbox-image:
   extends: .gcloud
@@ -32,7 +28,9 @@ toolbox-image:
     - gcloud compute disks delete "gitlab-ci-job-${CI_JOB_ID}"
 
 build:
-  extends: .gcloud-toolbox
+  extends: .gcloud
   stage: build
   script:
     - gcloud --project "${GCLOUD_PROJECT}" compute instances create gitlab-ci-job-${CI_JOB_ID} --zone "${GCLOUD_ZONE}" --tags common,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-family debian-vmx --machine-type n1-standard-16
+  after_script:
+    - gcloud --project "${GCLOUD_PROJECT}" compute instances delete "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --delete-disks=all || true
