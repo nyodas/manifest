@@ -4,6 +4,12 @@ include:
 stages:
   - build
 
+environment:
+  GCLOUD_PROJECT: datadog-build
+  GCLOUD_ZONE: us-east1-b
+  GCLOUD_NETWORK: datadog-build-us-east1
+  GCLOUD_SUBNET: datadog-build-us-east1-private
+
 test:
   stage: build
   image: google/cloud-sdk:slim
@@ -13,14 +19,7 @@ test:
     - aws ssm get-parameter --region us-east-1 --name ci.os-manifest.ci-os-manifest.json --with-decryption --query Parameter.Value --out text > ./google-sa.json
     - gcloud auth activate-service-account --key-file ./google-sa.json
   script:
-    - gcloud compute instances create gitlab-ci-job-${CI_JOB_ID} \
-      --zone us-east1-b \
-      --tags common,nat-us-east1 \
-      --no-address \
-      --network datadog-build-us-east1 \
-      --subnet datadog-build-us-east1-private \
-      --image-family debian-vmx \
-      --machine-type n1-standard-16
+    - gcloud --project "${GCLOUD_PROJECT}" compute instances create gitlab-ci-job-${CI_JOB_ID} --zone "${GCLOUD_ZONE}" --tags common,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-family debian-vmx --machine-type n1-standard-16
 
   after_script:
-    - gcloud compute instances delete "gitlab-ci-job-${CI_JOB_ID}" || true
+    - gcloud --project "${GCLOUD_PROJECT}" compute instances delete "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" || true
