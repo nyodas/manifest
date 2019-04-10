@@ -4,7 +4,7 @@ include:
 stages:
   - build
 
-environment:
+env:
   GCLOUD_PROJECT: datadog-build
   GCLOUD_ZONE: us-east1-b
   GCLOUD_NETWORK: datadog-build-us-east1
