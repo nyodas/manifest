@@ -24,8 +24,9 @@ ci-image:
     GCLOUD_SUBNET: datadog-build-us-east1-private
     GCLOUD_ZONE: us-east1-b
   before_script:
-    - aws ssm get-parameter --region us-east-1 --name ci.os-manifest.ci-os-manifest.json --with-decryption --query Parameter.Value --out text > ./google-sa.json
-    - gcloud auth activate-service-account --key-file ./google-sa.json
+    - aws ssm get-parameter --region us-east-1 --name ci.os-manifest.ci-os-manifest.json --with-decryption --query Parameter.Value --out text > /tmp/google-sa.json
+    - gcloud auth activate-service-account --key-file /tmp/google-sa.json
+    - rm /tmp/google-sa.json
 
 build:
   extends: .gcloud
