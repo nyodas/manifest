@@ -16,24 +16,21 @@ ci-image:
     - docker push 486234852809.dkr.ecr.us-east-1.amazonaws.com/ci/os-manifest:latest
 
 .gcloud:
+  image: 486234852809.dkr.ecr.us-east-1.amazonaws.com/ci/os-manifest:latest
   tags: ['runner:main', 'size:large']
-  image: google/cloud-sdk:slim
   variables:
     GCLOUD_PROJECT: datadog-build
     GCLOUD_ZONE: us-east1-b
     GCLOUD_NETWORK: datadog-build-us-east1
     GCLOUD_SUBNET: datadog-build-us-east1-private
   before_script:
-    - pip install awscli
     - aws ssm get-parameter --region us-east-1 --name ci.os-manifest.ci-os-manifest.json --with-decryption --query Parameter.Value --out text > ./google-sa.json
     - gcloud auth activate-service-account --key-file ./google-sa.json
-
-
 
 build:
   extends: .gcloud
   stage: build
   script:
-    - echo gcloud --project "${GCLOUD_PROJECT}" compute instances create "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --tags common,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-project debian-cloud --image-family debian-9 --machine-type n1-standard-16
+    - gcloud --project "${GCLOUD_PROJECT}" compute instances create "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --tags common,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-project debian-cloud --image-family debian-9 --machine-type n1-standard-16
   after_script:
-    - echo gcloud --project "${GCLOUD_PROJECT}" compute instances delete "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --delete-disks all
+    - gcloud --project "${GCLOUD_PROJECT}" compute instances delete "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --delete-disks all
