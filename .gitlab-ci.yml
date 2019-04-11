@@ -9,7 +9,7 @@ ci-image:
   stage: ci-image
   when: manual
   except: [ tags, schedules ]
-  tags: [ "runner:docker", "size:large" ]
+  tags: [ 'runner:docker', 'size:large' ]
   image: 486234852809.dkr.ecr.us-east-1.amazonaws.com/docker:18.03.1
   script:
     - docker build --tag 486234852809.dkr.ecr.us-east-1.amazonaws.com/ci/os-manifest:latest -f .ci/Dockerfile .
@@ -20,9 +20,9 @@ ci-image:
   tags: ['runner:main', 'size:large']
   variables:
     GCLOUD_PROJECT: datadog-build
-    GCLOUD_ZONE: us-east1-b
     GCLOUD_NETWORK: datadog-build-us-east1
     GCLOUD_SUBNET: datadog-build-us-east1-private
+    GCLOUD_ZONE: us-east1-b
   before_script:
     - aws ssm get-parameter --region us-east-1 --name ci.os-manifest.ci-os-manifest.json --with-decryption --query Parameter.Value --out text > ./google-sa.json
     - gcloud auth activate-service-account --key-file ./google-sa.json
@@ -32,7 +32,7 @@ build:
   stage: build
   script:
     - gcloud --project "${GCLOUD_PROJECT}" compute instances create "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --tags aws-build-stable-ssh,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-project debian-cloud --image-family debian-9 --preemptible --machine-type n1-standard-16
-    - until gcloud --project "${GCLOUD_PROJECT}" compute ssh "root@gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --internal-ip --command "find ~"; do sleep 3; done;
+    - until gcloud --project "${GCLOUD_PROJECT}" compute ssh root@gitlab-ci-job-${CI_JOB_ID} --zone "${GCLOUD_ZONE}" --internal-ip --command "find ~" -- -vv; do sleep 3; done;
     - gcloud --project "${GCLOUD_PROJECT}" beta compute scp ./ "gitlab-ci-job-${CI_JOB_ID}:~/os-manifest" --zone "${GCLOUD_ZONE}" --recurse --internal-ip
     - gcloud --project "${GCLOUD_PROJECT}" compute ssh "gitlab-ci-job-${CI_JOB_ID}" "find ~" --zone "${GCLOUD_ZONE}" --internal-ip
   after_script:
