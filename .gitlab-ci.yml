@@ -2,8 +2,18 @@ include:
   - remote: 'https://gitlab-templates.ddbuild.io/slack-notifier/v1/template.yml'
 
 stages:
-  - toolbox-image
+  - ci-image
   - build
+
+ci-image:
+  stage: ci-image
+  when: manual
+  except: [ tags, schedules ]
+  tags: [ "runner:docker", "size:large" ]
+  image: 486234852809.dkr.ecr.us-east-1.amazonaws.com/docker:18.03.1
+  script:
+    - docker build --tag 486234852809.dkr.ecr.us-east-1.amazonaws.com/ci/os-manifest:latest -f .ci/Dockerfile .
+    - docker push 486234852809.dkr.ecr.us-east-1.amazonaws.com/ci/os-manifest:latest
 
 .gcloud:
   tags: ['runner:main', 'size:large']
@@ -18,19 +28,12 @@ stages:
     - aws ssm get-parameter --region us-east-1 --name ci.os-manifest.ci-os-manifest.json --with-decryption --query Parameter.Value --out text > ./google-sa.json
     - gcloud auth activate-service-account --key-file ./google-sa.json
 
-toolbox-image:
-  extends: .gcloud
-  stage: toolbox-image
-  when: manual
-  script:
-    - gcloud --project "${GCLOUD_PROJECT}" compute disks create "gitlab-ci-job-${CI_JOB_ID}" --image-project debian-cloud --image-family debian-9 --zone "${GCLOUD_ZONE}"
-    - gcloud --project "${GCLOUD_PROJECT}" compute images create "os-manifest-builder-${CI_JOB_ID}" --source-disk "gitlab-ci-job-${CI_JOB_ID}" --source-disk-zone "${GCLOUD_ZONE}" --licenses "https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx" --family "os-manifest-builder"
-    - gcloud --project "${GCLOUD_PROJECT}" compute disks delete "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}"
+
 
 build:
   extends: .gcloud
   stage: build
   script:
-    - gcloud --project "${GCLOUD_PROJECT}" compute instances create "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --tags common,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-family os-manifest-builder --machine-type n1-standard-16
+    - echo gcloud --project "${GCLOUD_PROJECT}" compute instances create "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --tags common,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-project debian-cloud --image-family debian-9 --machine-type n1-standard-16
   after_script:
-    - gcloud --project "${GCLOUD_PROJECT}" compute instances delete "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --delete-disks all
+    - echo gcloud --project "${GCLOUD_PROJECT}" compute instances delete "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --delete-disks all
