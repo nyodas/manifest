@@ -31,7 +31,7 @@ build:
   extends: .gcloud
   stage: build
   script:
-    - gcloud --project "${GCLOUD_PROJECT}" compute instances create "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --tags common,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-project debian-cloud --image-family debian-9 --machine-type n1-standard-16
+    - gcloud --project "${GCLOUD_PROJECT}" compute instances create "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --tags common,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-project debian-cloud --image-family debian-9 --preemptible --machine-type n1-standard-16
     - gcloud --project "${GCLOUD_PROJECT}" compute scp ./ "gitlab-ci-job-${CI_JOB_ID}:~/os-manifest" --zone "${GCLOUD_ZONE}" --recurse
     - gcloud --project "${GCLOUD_PROJECT}" compute ssh "gitlab-ci-job-${CI_JOB_ID}" "find ~"
   after_script:
