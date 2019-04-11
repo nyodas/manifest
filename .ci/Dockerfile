@@ -2,6 +2,5 @@ FROM google/cloud-sdk:slim
 
 RUN pip install awscli
 
-RUN useradd builder
-
+RUN useradd -m builder
 USER builder

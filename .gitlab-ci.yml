@@ -12,11 +12,11 @@ ci-image:
   tags: [ 'runner:docker', 'size:large' ]
   image: 486234852809.dkr.ecr.us-east-1.amazonaws.com/docker:18.03.1
   script:
-    - docker build --tag 486234852809.dkr.ecr.us-east-1.amazonaws.com/ci/os-manifest:0.2 -f .ci/Dockerfile .
-    - docker push 486234852809.dkr.ecr.us-east-1.amazonaws.com/ci/os-manifest:0.2
+    - docker build --tag 486234852809.dkr.ecr.us-east-1.amazonaws.com/ci/os-manifest:0.3 -f .ci/Dockerfile .
+    - docker push 486234852809.dkr.ecr.us-east-1.amazonaws.com/ci/os-manifest:0.3
 
 .gcloud:
-  image: 486234852809.dkr.ecr.us-east-1.amazonaws.com/ci/os-manifest:0.2
+  image: 486234852809.dkr.ecr.us-east-1.amazonaws.com/ci/os-manifest:0.3
   tags: ['runner:main', 'size:large']
   variables:
     GCLOUD_PROJECT: datadog-build
