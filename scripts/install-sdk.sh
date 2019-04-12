@@ -29,8 +29,10 @@ setup_gcsproxy
 
 test -x bin/cork || {
 	log "installing cork"
+	set -x
 	curl -fsSL -o bin/cork http://localhost:${GCSPROXY_PORT}/${TOOLS_BUCKET#gs://}/mantle-${MANTLE_VERSION}/cork
 	chmod +x bin/cork
+	set +x
 }
 
 test -x bin/plume || {
