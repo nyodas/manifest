@@ -43,10 +43,9 @@ log "determining correct manifest file for branch"
 manifest_url="$(git remote get-url origin)"
 manifest_branch="$(git rev-parse HEAD)"
 
-set -x
-if git symbolic-ref HEAD 2>&1 >/dev/null; then
+if git symbolic-ref HEAD 2>/dev/null >/dev/null; then
 	branch_ref="$(git symbolic-ref HEAD)"
-elif git describe --exact-match --tags HEAD 2>&1 >/dev/null; then
+elif git describe --exact-match --tags HEAD 2>/dev/null >/dev/null; then
 	branch_ref="refs/tags/$(git tag --points-at HEAD | sort -Vr | head -n1)"
 else
 	branch_ref="$(git rev-parse HEAD)"
@@ -60,12 +59,11 @@ case ${branch_ref} in
 	*)
 		manifest_name="default.xml" ;;
 esac
-set +x
-echo "manifest name is ${manifest_name}"
+log "using manifest ${manifest_name}"
+
+export GPG_PUBLIC_KEY=""
 
 log "running cork create"
-SDK_URL_HOST="localhost:${GCSPROXY_PORT}" \
-SDK_URL_PATH="/${BUILDS_BUCKET#gs://}/sdk" \
 bin/cork create \
 	--verbose \
 	--replace \
