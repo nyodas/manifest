@@ -1,3 +1,5 @@
+#TODO use ci-robot account token to auth to github for pull and push
+
 include:
   - remote: 'https://gitlab-templates.ddbuild.io/slack-notifier/v1/template.yml'
 
@@ -36,7 +38,7 @@ tag-release:
   script:
     - gcloud --project "${GCLOUD_PROJECT}" compute instances create "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --tags aws-build-stable-ssh,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-project debian-cloud --image-family debian-9 --service-account os-manifest-builder@datadog-build.iam.gserviceaccount.com --preemptible --machine-type n1-standard-16
     - gcloud --project "${GCLOUD_PROJECT}" beta compute scp "$(pwd)" "gitlab-ci-job-${CI_JOB_ID}:~/os-manifest" --zone "${GCLOUD_ZONE}" --recurse --internal-ip
-    - gcloud --project "${GCLOUD_PROJECT}" compute ssh "gitlab-ci-job-${CI_JOB_ID}" --command "cd os-manifest && ./.ci/scripts/install-deps.sh && ./scripts/install-sdk.sh && ./scripts/tag-release.sh" --zone "${GCLOUD_ZONE}" --internal-ip
+    - gcloud --project "${GCLOUD_PROJECT}" compute ssh "gitlab-ci-job-${CI_JOB_ID}" --command "cd os-manifest && ./.ci/scripts/install-deps.sh && ./scripts/install-sdk.sh && ./scripts/tag-release.sh" --zone "${GCLOUD_ZONE}" --internal-ip -- -A
   after_script:
     - gcloud --project "${GCLOUD_PROJECT}" compute instances delete "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --delete-disks=all
 
@@ -48,7 +50,7 @@ build-sdk:
   script:
     - gcloud --project "${GCLOUD_PROJECT}" compute instances create "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --tags aws-build-stable-ssh,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-project debian-cloud --image-family debian-9 --service-account os-manifest-builder@datadog-build.iam.gserviceaccount.com --preemptible --machine-type n1-standard-16
     - gcloud --project "${GCLOUD_PROJECT}" beta compute scp "$(pwd)" "gitlab-ci-job-${CI_JOB_ID}:~/os-manifest" --zone "${GCLOUD_ZONE}" --recurse --internal-ip
-    - gcloud --project "${GCLOUD_PROJECT}" compute ssh "gitlab-ci-job-${CI_JOB_ID}" --command "cd os-manifest && ./.ci/scripts/install-deps.sh && ./scripts/install-sdk.sh && ./scripts/build-sdk.sh" --zone "${GCLOUD_ZONE}" --internal-ip
+    - gcloud --project "${GCLOUD_PROJECT}" compute ssh "gitlab-ci-job-${CI_JOB_ID}" --command "cd os-manifest && ./.ci/scripts/install-deps.sh && ./scripts/install-sdk.sh && ./scripts/build-sdk.sh" --zone "${GCLOUD_ZONE}" --internal-ip -- -A
   after_script:
     - gcloud --project "${GCLOUD_PROJECT}" compute instances delete "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --delete-disks=all
 
@@ -58,6 +60,6 @@ build-image:
   script:
     - gcloud --project "${GCLOUD_PROJECT}" compute instances create "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --tags aws-build-stable-ssh,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-project debian-cloud --image-family debian-9 --service-account os-manifest-builder@datadog-build.iam.gserviceaccount.com --preemptible --machine-type n1-standard-16
     - gcloud --project "${GCLOUD_PROJECT}" beta compute scp "$(pwd)" "gitlab-ci-job-${CI_JOB_ID}:~/os-manifest" --zone "${GCLOUD_ZONE}" --recurse --internal-ip
-    - gcloud --project "${GCLOUD_PROJECT}" compute ssh "gitlab-ci-job-${CI_JOB_ID}" --command "cd os-manifest && ./.ci/scripts/install-deps.sh && ./scripts/install-sdk.sh && ./scripts/build-image.sh" --zone "${GCLOUD_ZONE}" --internal-ip
+    - gcloud --project "${GCLOUD_PROJECT}" compute ssh "gitlab-ci-job-${CI_JOB_ID}" --command "cd os-manifest && ./.ci/scripts/install-deps.sh && ./scripts/install-sdk.sh && ./scripts/build-image.sh" --zone "${GCLOUD_ZONE}" --internal-ip -- -A
   after_script:
     - gcloud --project "${GCLOUD_PROJECT}" compute instances delete "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --delete-disks=all

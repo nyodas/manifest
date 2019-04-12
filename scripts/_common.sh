@@ -4,11 +4,11 @@ if [ "${VERBOSE:-}" == "true" ]; then
 	set -x
 fi
 
+export MANTLE_VERSION="v0.0.0"
+
 export TOOLS_BUCKET="${TOOLS_BUCKET:-gs://datadog-os-tools}"
 export BUILDS_BUCKET="${BUILDS_BUCKET:-gs://datadog-os-builds}"
 export RELEASE_BUCKET="${RELEASE_BUCKET:-gs://datadog-os-images}"
-
-export MANTLE_VERSION="v0.0.0"
 
 export GCSPROXY_PORT="${GCSPROXY_PORT:-8090}"
 export COREOS_DEV_BUILDS="http://localhost:${GCSPROXY_PORT}/${BUILDS_BUCKET#gs://}"
@@ -53,7 +53,7 @@ configure_github_push() {
 
 	export GIT_SSH_COMMAND="${GIT_SSH_COMMAND:-"ssh -o StrictHostKeyChecking=no"}"
 	if test -f "${GITHUB_DEPLOY_KEY}"; then
-		export GIT_SSH_COMMAND="${GIT_SSH_COOMMAND} -i ${GITHUB_DEPLOY_KEY}"
+		export GIT_SSH_COMMAND="${GIT_SSH_COMMAND} -i ${GITHUB_DEPLOY_KEY}"
 	fi
 
 	git -C "${repodir}" config user.name "buildbot"
