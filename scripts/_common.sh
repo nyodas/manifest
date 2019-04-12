@@ -24,8 +24,7 @@ setup_gcsproxy() {
 	test -x bin/gcsproxy || fatal "bin/gcsproxy not found"
 
 	bin/gcsproxy -v \
-		-b "127.0.0.1:${GCSPROXY_PORT}" \
-		-c "${GOOGLE_APPLICATION_CREDENTIALS}" 2>gcsproxy.log &
+		-b "127.0.0.1:${GCSPROXY_PORT}"  2>gcsproxy.log &
 	echo $! > gcsproxy.pid
 
 	until curl -s "http://127.0.0.1:${GCSPROXY_PORT}" >/dev/null; do sleep 1; done;
