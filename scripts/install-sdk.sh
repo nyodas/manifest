@@ -35,7 +35,7 @@ test -x bin/cork || {
 
 test -x bin/plume || {
 	log "installing plume"
-	curl -fsSL -o bin/plume http://localhost:${GCSPROXY_PORT}/${TOOLS_BUCKET#gs://}/mantle-v0.12.1-1/plume
+	curl -fsSL -o bin/plume http://localhost:${GCSPROXY_PORT}/${TOOLS_BUCKET#gs://}/mantle-${MANTLE_VERSION#v}/plume
 	chmod +x bin/plume
 }
 
