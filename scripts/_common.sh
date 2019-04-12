@@ -4,9 +4,11 @@ if [ "${VERBOSE:-}" == "true" ]; then
 	set -x
 fi
 
-export TOOLS_BUCKET="${TOOLS_BUCKET:-gs://dd-os-tools}"
-export BUILDS_BUCKET="${BUILDS_BUCKET:-gs://dd-os-builds}"
-export RELEASE_BUCKET="${RELEASE_BUCKET:-gs://dd-os-images}"
+export TOOLS_BUCKET="${TOOLS_BUCKET:-gs://datadog-os-tools}"
+export BUILDS_BUCKET="${BUILDS_BUCKET:-gs://datadog-os-builds}"
+export RELEASE_BUCKET="${RELEASE_BUCKET:-gs://datadog-os-images}"
+
+export MANTLE_VERSION="v0.0.2"
 
 export GCSPROXY_PORT="${GCSPROXY_PORT:-8090}"
 export COREOS_DEV_BUILDS="http://localhost:${GCSPROXY_PORT}/${BUILDS_BUCKET#gs://}"

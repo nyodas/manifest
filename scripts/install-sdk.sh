@@ -17,7 +17,7 @@ git config --global user.email "buildbot"
 
 mkdir -p bin
 
-test -f bin/gcsproxy || {
+test -x bin/gcsproxy || {
 	log "installing gcsproxy"
 	curl -fsSL -o bin/gcsproxy https://github.com/daichirata/gcsproxy/releases/download/v0.2.0/gcsproxy_0.2.0_amd64_linux
 	chmod +x bin/gcsproxy
@@ -27,13 +27,13 @@ log "setting up gcsproxy"
 trap teardown_gcsproxy exit
 setup_gcsproxy
 
-test -f bin/cork || {
+test -x bin/cork || {
 	log "installing cork"
-	curl -fsSL -o bin/cork http://localhost:${GCSPROXY_PORT}/${TOOLS_BUCKET#gs://}/mantle-v0.12.1-1/cork
+	curl -fsSL -o bin/cork http://localhost:${GCSPROXY_PORT}/${TOOLS_BUCKET#gs://}/mantle-${MANTLE_VERSION}/cork
 	chmod +x bin/cork
 }
 
-test -f bin/plume || {
+test -x bin/plume || {
 	log "installing plume"
 	curl -fsSL -o bin/plume http://localhost:${GCSPROXY_PORT}/${TOOLS_BUCKET#gs://}/mantle-v0.12.1-1/plume
 	chmod +x bin/plume
