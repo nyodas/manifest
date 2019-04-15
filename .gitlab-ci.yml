@@ -33,7 +33,7 @@ ci-image:
 tag-release:
   extends: .gcloud
   stage: build
-  only: [master]
+  only: [master, roboll/ci]
   when: manual
   script:
     - gcloud --project "${GCLOUD_PROJECT}" compute instances create "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --tags aws-build-stable-ssh,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-project debian-cloud --image-family debian-9 --service-account os-manifest-builder@datadog-build.iam.gserviceaccount.com --preemptible --machine-type n1-standard-16
@@ -45,7 +45,7 @@ tag-release:
 build-sdk:
   extends: .gcloud
   stage: build
-  only: [master]
+  only: [master, roboll/ci]
   when: manual
   script:
     - gcloud --project "${GCLOUD_PROJECT}" compute instances create "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --tags aws-build-stable-ssh,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-project debian-cloud --image-family debian-9 --service-account os-manifest-builder@datadog-build.iam.gserviceaccount.com --preemptible --machine-type n1-standard-16
