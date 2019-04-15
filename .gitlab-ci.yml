@@ -3,9 +3,6 @@
 include:
   - remote: 'https://gitlab-templates.ddbuild.io/slack-notifier/v1/template.yml'
 
-
-git config --global url."https://${GITHUB_TOKEN}@github.com/DataDog".insteadOf https://github.com/DataDog
-
 stages:
   - ci-image
   - build
