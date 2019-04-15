@@ -60,9 +60,10 @@ build-image:
   script:
     - gcloud --project "${GCLOUD_PROJECT}" compute instances create "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --tags aws-build-stable-ssh,nat-us-east1 --no-address --network "${GCLOUD_NETWORK}" --subnet "${GCLOUD_SUBNET}" --image-project debian-cloud --image-family debian-9 --service-account os-manifest-builder@datadog-build.iam.gserviceaccount.com --preemptible --machine-type n1-standard-16
     - gcloud --project "${GCLOUD_PROJECT}" beta compute scp "$(pwd)" "gitlab-ci-job-${CI_JOB_ID}:~/os-manifest" --zone "${GCLOUD_ZONE}" --recurse --internal-ip
+    - gcloud --project "${GCLOUD_PROJECT}" compute ssh "gitlab-ci-job-${CI_JOB_ID}" --command "cd os-manifest && ./.ci/scripts/install-deps.sh" --zone "${GCLOUD_ZONE}" --internal-ip -- -A
     - export GITHUB_TOKEN="$(aws ssm get-parameter --region us-east-1 --name ci.os-manifest.github-token --with-decryption --query Parameter.Value --out text)"
     - gcloud --project "${GCLOUD_PROJECT}" compute ssh "gitlab-ci-job-${CI_JOB_ID}" --command "git config --global url.\"https://${GITHUB_TOKEN}@github.com/DataDog\".insteadOf https://github.com/DataDog" --zone "${GCLOUD_ZONE}" --internal-ip -- -A
-    - gcloud --project "${GCLOUD_PROJECT}" compute ssh "gitlab-ci-job-${CI_JOB_ID}" --command "cd os-manfeest && git remote set-url origin https://github.com/DataDog/os-manifest" --zone "${GCLOUD_ZONE}" --internal-ip -- -A
-    - gcloud --project "${GCLOUD_PROJECT}" compute ssh "gitlab-ci-job-${CI_JOB_ID}" --command "cd os-manifest && ./.ci/scripts/install-deps.sh && ./scripts/install-sdk.sh && ./scripts/build-image.sh" --zone "${GCLOUD_ZONE}" --internal-ip -- -A
+    - gcloud --project "${GCLOUD_PROJECT}" compute ssh "gitlab-ci-job-${CI_JOB_ID}" --command "cd os-manifest && git remote set-url origin https://github.com/DataDog/os-manifest" --zone "${GCLOUD_ZONE}" --internal-ip -- -A
+    - gcloud --project "${GCLOUD_PROJECT}" compute ssh "gitlab-ci-job-${CI_JOB_ID}" --command "cd os-manifest && ./scripts/install-sdk.sh && ./scripts/build-image.sh" --zone "${GCLOUD_ZONE}" --internal-ip -- -A
   after_script:
     - gcloud --project "${GCLOUD_PROJECT}" compute instances delete "gitlab-ci-job-${CI_JOB_ID}" --zone "${GCLOUD_ZONE}" --delete-disks=all
