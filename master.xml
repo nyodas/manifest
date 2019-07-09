@@ -79,10 +79,6 @@ Your sources have been sync'd successfully.
            name="coreos/mantle"
            groups="minilayout" />
 
-  <project path="src/third_party/rkt"
-           name="rkt/rkt"
-           groups="minilayout" />
-
   <project path="src/third_party/systemd"
            name="coreos/systemd"
            groups="minilayout" />

@@ -34,5 +34,4 @@
   <project groups="minilayout" name="coreos/update-ssh-keys" path="src/third_party/update-ssh-keys" revision="bd749f634b059c92fd03b42b6b0c961d2e2ebcc6" upstream="refs/heads/master"/>
   <project groups="minilayout" name="coreos/update_engine" path="src/third_party/update_engine" revision="b0a992aca295028f9854a9036f1e089c09539fb1" upstream="refs/heads/master"/>
   <project groups="minilayout" name="coreos/updateservicectl" path="src/third_party/updateservicectl" revision="cf2a962b5a44760365788ce8621a7057be7d6cc2" upstream="refs/heads/master"/>
-  <project groups="minilayout" name="rkt/rkt" path="src/third_party/rkt" revision="a2f63178ee7749a4e90a2882744774dbd03bb425" upstream="refs/heads/master"/>
 </manifest>
